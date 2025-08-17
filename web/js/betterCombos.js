@@ -3,20 +3,16 @@ import { ComfyWidgets } from "../../../scripts/widgets.js";
 import { $el } from "../../../scripts/ui.js";
 import { api } from "../../../scripts/api.js";
 
-const CHECKPOINT_LOADER = "CheckpointLoader|pysssss";
 const LORA_LOADER = "LoraLoader|pysssss";
 const IMAGE_WIDTH = 384;
 const IMAGE_HEIGHT = 384;
 
 function getType(node) {
-	if (node.comfyClass === CHECKPOINT_LOADER) {
-		return "checkpoints";
-	}
-	return "loras";
+        return "loras";
 }
 
 function getWidgetName(type) {
-	return type === "checkpoints" ? "ckpt_name" : "lora_name";
+        return "lora_name";
 }
 
 function encodeRFC3986URIComponent(str) {
@@ -71,13 +67,13 @@ const loadImageList = async (type) => {
 app.registerExtension({
 	name: "pysssss.Combo++",
 	init() {
-		const displayOptions = { "List (normal)": 0, "Tree (subfolders)": 1, "Thumbnails (grid)": 2 };
-		const displaySetting = app.ui.settings.addSetting({
-			id: "pysssss.Combo++.Submenu",
-			name: "🐍 Lora & Checkpoint loader display mode",
-			defaultValue: 1,
-			type: "combo",
-			options: (value) => {
+                const displayOptions = { "List (normal)": 0, "Tree (subfolders)": 1, "Thumbnails (grid)": 2 };
+                const displaySetting = app.ui.settings.addSetting({
+                        id: "pysssss.Combo++.Submenu",
+                        name: "🐍 Lora loader display mode",
+                        defaultValue: 1,
+                        type: "combo",
+                        options: (value) => {
 				value = +value;
 
 				return Object.entries(displayOptions).map(([k, v]) => ({
@@ -157,18 +153,16 @@ app.registerExtension({
 			`,
 			parent: document.body,
 		});
-		const p1 = loadImageList("checkpoints");
-		const p2 = loadImageList("loras");
+                const p = loadImageList("loras");
 
-		const refreshComboInNodes = app.refreshComboInNodes;
-		app.refreshComboInNodes = async function () {
-			const r = await Promise.all([
-				refreshComboInNodes.apply(this, arguments),
-				loadImageList("checkpoints").catch(() => {}),
-				loadImageList("loras").catch(() => {}),
-			]);
-			return r[0];
-		};
+                const refreshComboInNodes = app.refreshComboInNodes;
+                app.refreshComboInNodes = async function () {
+                        const r = await Promise.all([
+                                refreshComboInNodes.apply(this, arguments),
+                                loadImageList("loras").catch(() => {}),
+                        ]);
+                        return r[0];
+                };
 
 		const imageHost = $el("img.pysssss-combo-image");
 
@@ -191,13 +185,12 @@ app.registerExtension({
 		};
 
 		const updateMenu = async (menu, type) => {
-			try {
-				await p1;
-				await p2;
-			} catch (error) {
-				console.error(error);
-				console.error("Error loading pysssss.betterCombos data");
-			}
+                        try {
+                                await p;
+                        } catch (error) {
+                                console.error(error);
+                                console.error("Error loading pysssss.betterCombos data");
+                        }
 
 			// Clamp max height so it doesn't overflow the screen
 			const position = menu.getBoundingClientRect();
@@ -363,11 +356,11 @@ app.registerExtension({
 		};
 
 		const mutationObserver = new MutationObserver((mutations) => {
-			const node = app.canvas.current_node;
+                        const node = app.canvas.current_node;
 
-			if (!node || (node.comfyClass !== LORA_LOADER && node.comfyClass !== CHECKPOINT_LOADER)) {
-				return;
-			}
+                        if (!node || node.comfyClass !== LORA_LOADER) {
+                                return;
+                        }
 
 			for (const mutation of mutations) {
 				for (const removed of mutation.removedNodes) {
@@ -395,20 +388,19 @@ app.registerExtension({
 		mutationObserver.observe(document.body, { childList: true, subtree: false });
 	},
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		const isCkpt = nodeData.name === CHECKPOINT_LOADER;
-		const isLora = nodeData.name === LORA_LOADER;
-		if (isCkpt || isLora) {
-			const onAdded = nodeType.prototype.onAdded;
-			nodeType.prototype.onAdded = function () {
+                const isLora = nodeData.name === LORA_LOADER;
+                if (isLora) {
+                        const onAdded = nodeType.prototype.onAdded;
+                        nodeType.prototype.onAdded = function () {
 				onAdded?.apply(this, arguments);
 				const { widget: exampleList } = ComfyWidgets["COMBO"](this, "example", [[""], {}], app);
 				this.widgets.find((w) => w.name === "prompt").computeSize = () => [0, -4];
 				let exampleWidget;
 
-				const get = async (route, suffix) => {
-					const url = encodeRFC3986URIComponent(`${getType(nodeType)}${suffix || ""}`);
-					return await api.fetchApi(`/pysssss/${route}/${url}`);
-				};
+                                const get = async (route, suffix) => {
+                                        const url = encodeRFC3986URIComponent(`loras${suffix || ""}`);
+                                        return await api.fetchApi(`/pysssss/${route}/${url}`);
+                                };
 
 				const getExample = async () => {
 					if (exampleList.value === "[none]") {
@@ -500,7 +492,7 @@ app.registerExtension({
 					img = this.imgs[this.overIndex];
 				}
 				if (img) {
-					const nodes = app.graph._nodes.filter((n) => n.comfyClass === LORA_LOADER || n.comfyClass === CHECKPOINT_LOADER);
+                                        const nodes = app.graph._nodes.filter((n) => n.comfyClass === LORA_LOADER);
 					if (nodes.length) {
 						options.unshift({
 							content: "Save as Preview",
