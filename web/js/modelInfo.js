@@ -382,7 +382,7 @@ app.registerExtension({
 		);
 		addSetting(
 			"Checkpoint",
-			["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "CheckpointLoader|pysssss", "Efficient Loader", "Eff. Loader SDXL"].join(",")
+                        ["CheckpointLoader.ckpt_name", "CheckpointLoaderSimple", "Efficient Loader", "Eff. Loader SDXL"].join(",")
 		);
 
 		app.ui.settings.addSetting({

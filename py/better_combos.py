@@ -163,10 +163,8 @@ class CheckpointLoaderSimpleWithImages(CheckpointLoaderSimple):
 
 NODE_CLASS_MAPPINGS = {
     "LoraLoader|pysssss": LoraLoaderWithImages,
-    "CheckpointLoader|pysssss": CheckpointLoaderSimpleWithImages,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LoraLoader|pysssss": "Lora Loader 🐍",
-    "CheckpointLoader|pysssss": "Checkpoint Loader 🐍",
 }

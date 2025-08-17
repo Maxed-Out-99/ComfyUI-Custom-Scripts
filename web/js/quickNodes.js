@@ -143,11 +143,10 @@ app.registerExtension({
 		}
 
 		if (
-			nodeData.name === "CheckpointLoaderSimple" ||
-			nodeData.name === "CheckpointLoader" ||
-			nodeData.name === "CheckpointLoader|pysssss" ||
-			nodeData.name === "LoraLoader" ||
-			nodeData.name === "LoraLoader|pysssss"
+                        nodeData.name === "CheckpointLoaderSimple" ||
+                        nodeData.name === "CheckpointLoader" ||
+                        nodeData.name === "LoraLoader" ||
+                        nodeData.name === "LoraLoader|pysssss"
 		) {
 			addMenuHandler(nodeType, function (_, options) {
 				function addLora(type) {
